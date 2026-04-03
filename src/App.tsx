@@ -112,22 +112,32 @@ export default function App() {
 
   useEffect(() => {
     const fetchAnimeImages = async () => {
-      const fetchImage = async (api: string) => {
+      const apis = [
+        'https://api.waifu.pics/sfw/waifu',
+        'https://api.waifu.pics/sfw/neko',
+        'https://api.waifu.pics/sfw/shinobu',
+        'https://nekos.best/api/v2/neko',
+        'https://nekos.best/api/v2/waifu',
+        'https://api.waifu.im/search'
+      ];
+
+      const fetchRandomImage = async () => {
+        const api = apis[Math.floor(Math.random() * apis.length)];
         try {
           const res = await fetch(api);
           const data = await res.json();
           return data.url || (data.results && data.results[0].url) || (data.images && data.images[0].url) || 'https://picsum.photos/seed/anime/200/200';
         } catch (e) {
-          console.error("Failed to fetch anime image", e);
+          console.error("Failed to fetch anime image from", api, e);
           return 'https://picsum.photos/seed/anime/200/200';
         }
       };
 
       const [riceShower, scatter, superScatter, multiplier] = await Promise.all([
-        fetchImage('https://api.waifu.pics/sfw/waifu'),
-        fetchImage('https://nekos.best/api/v2/neko'),
-        fetchImage('https://api.waifu.im/search'),
-        fetchImage('https://api.waifu.pics/sfw/neko')
+        fetchRandomImage(),
+        fetchRandomImage(),
+        fetchRandomImage(),
+        fetchRandomImage()
       ]);
 
       setSymbols(prev => prev.map(s => s.id === 'rice_shower' ? { ...s, image: riceShower } : s));
@@ -267,11 +277,16 @@ export default function App() {
     let currentGrid = [...initialGrid.map(col => [...col])];
     let totalTumbleWin = 0;
     let accumulatedMultipliers: number[] = [];
-    let totalScatters = 0;
+    let seenScatters = new Set<string>();
 
     while (true) {
       const { win, scattersCount, currentMultipliers } = checkWins(currentGrid);
-      totalScatters += scattersCount;
+      
+      currentGrid.forEach(col => col.forEach(sym => {
+        if (sym && (sym.type === 'scatter' || sym.type === 'super_scatter')) {
+          seenScatters.add(sym.instanceId);
+        }
+      }));
       
       if (win === 0) break;
 
@@ -303,7 +318,7 @@ export default function App() {
       // Fill gaps
       currentGrid = currentGrid.map(col => {
         const missing = ROWS - col.length;
-        const newSyms = Array(missing).fill(0).map(() => generateRandomSymbol(state.isSuperFreeSpins));
+        const newSyms = Array(missing).fill(0).map(() => generateRandomSymbol(state.isSuperFreeSpins, state.spinsSinceLastScatter));
         return [...newSyms, ...col];
       });
 
@@ -328,6 +343,8 @@ export default function App() {
     // Trigger Free Spins
     let freeSpinsTriggered = false;
     let superFreeSpinsTriggered = false;
+    const totalScatters = seenScatters.size;
+    
     if (!state.isFreeSpins && !state.isSuperFreeSpins) {
       if (totalScatters >= 5) {
         superFreeSpinsTriggered = true;
@@ -335,6 +352,47 @@ export default function App() {
         freeSpinsTriggered = true;
       }
     }
+
+    if (freeSpinsTriggered || superFreeSpinsTriggered) {
+      scatterSound();
+    }
+
+    setState(prev => {
+      const newSpinsSinceLastScatter = (freeSpinsTriggered || superFreeSpinsTriggered) ? 0 : prev.spinsSinceLastScatter + 1;
+      let newFreeSpinsRemaining = prev.freeSpinsRemaining;
+      let newIsFreeSpins = prev.isFreeSpins;
+      let newIsSuperFreeSpins = prev.isSuperFreeSpins;
+
+      if (prev.isFreeSpins && !freeSpinsTriggered && !superFreeSpinsTriggered) {
+        newFreeSpinsRemaining -= 1;
+        if (newFreeSpinsRemaining <= 0) {
+          newIsFreeSpins = false;
+          newIsSuperFreeSpins = false;
+          newFreeSpinsRemaining = 0;
+        }
+      } else if (freeSpinsTriggered || superFreeSpinsTriggered) {
+        newIsFreeSpins = true;
+        newIsSuperFreeSpins = superFreeSpinsTriggered;
+        newFreeSpinsRemaining = 15;
+      }
+
+      return { 
+        ...prev, 
+        isSpinning: false, 
+        currentTumbleWin: 0, 
+        multipliers: [],
+        balance: prev.balance + finalWin,
+        totalWin: finalWin,
+        history: finalWin > 0 ? [finalWin, ...prev.history].slice(0, 10) : prev.history,
+        isFreeSpins: newIsFreeSpins,
+        isSuperFreeSpins: newIsSuperFreeSpins,
+        freeSpinsRemaining: newFreeSpinsRemaining,
+        spinsSinceLastScatter: newSpinsSinceLastScatter,
+        aiMessage: superFreeSpinsTriggered ? "SUPER CLIMAX MODE ACTIVATED! Ultimate win potential!" 
+                 : freeSpinsTriggered ? "CLIMAX MODE ACTIVATED! Let's go for the win!" 
+                 : prev.aiMessage
+      };
+    });
 
     if (finalWin > 0 || freeSpinsTriggered || superFreeSpinsTriggered) {
       if (finalMultiplier > 1) {
@@ -344,19 +402,8 @@ export default function App() {
           origin: { y: 0.6 }
         });
       }
-      setState(prev => ({ 
-        ...prev, 
-        balance: prev.balance + finalWin,
-        totalWin: finalWin,
-        history: [finalWin, ...prev.history].slice(0, 10),
-        isFreeSpins: freeSpinsTriggered ? true : prev.isFreeSpins,
-        isSuperFreeSpins: superFreeSpinsTriggered ? true : prev.isSuperFreeSpins,
-        freeSpinsRemaining: (freeSpinsTriggered || superFreeSpinsTriggered) ? 10 : prev.freeSpinsRemaining
-      }));
       updateAIMessage(finalWin, state.isFreeSpins || freeSpinsTriggered || superFreeSpinsTriggered);
     }
-
-    setState(prev => ({ ...prev, isSpinning: false, currentTumbleWin: 0, multipliers: [] }));
   };
 
   const handleSpin = useCallback(async () => {
@@ -383,36 +430,7 @@ export default function App() {
     setState(prev => ({ ...prev, grid: newGrid }));
     await new Promise(r => setTimeout(r, 400));
     
-    // Check for scatters to trigger free spins
-    const { scattersCount } = checkWins(newGrid);
-    if (scattersCount >= 3 && !state.isFreeSpins) {
-      scatterSound();
-      const isSuper = scattersCount >= 5;
-      setState(prev => ({ 
-        ...prev, 
-        freeSpinsRemaining: 15, 
-        isFreeSpins: true,
-        isSuperFreeSpins: isSuper,
-        spinsSinceLastScatter: 0,
-        aiMessage: isSuper ? "SUPER CLIMAX MODE ACTIVATED! Ultimate win potential!" : "CLIMAX MODE ACTIVATED! Let's go for the win!"
-      }));
-    } else {
-      setState(prev => ({ ...prev, spinsSinceLastScatter: prev.spinsSinceLastScatter + 1 }));
-    }
-
     await tumble(newGrid);
-
-    // Handle Free Spins decrement
-    setState(prev => {
-      if (prev.isFreeSpins) {
-        const remaining = prev.freeSpinsRemaining - 1;
-        if (remaining <= 0) {
-          return { ...prev, freeSpinsRemaining: 0, isFreeSpins: false, isSuperFreeSpins: false };
-        }
-        return { ...prev, freeSpinsRemaining: remaining };
-      }
-      return prev;
-    });
   }, [state.isSpinning, state.balance, state.bet, state.isFreeSpins, state.isSuperFreeSpins, state.spinsSinceLastScatter, generateRandomSymbol, tumble]);
 
   // Auto Spin Effect
@@ -534,12 +552,19 @@ export default function App() {
                         <motion.div
                           key={sym.instanceId}
                           initial={{ opacity: 0, scale: 0.5 }}
-                          animate={{ 
+                          animate={sym.isWinning ? {
+                            opacity: 1,
+                            scale: [1, 1.1, 1],
+                          } : { 
                             opacity: 1, 
                             scale: 1,
                           }}
                           exit={{ opacity: 0, scale: 0 }}
-                          transition={{ 
+                          transition={sym.isWinning ? {
+                            duration: 0.6,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                          } : { 
                             type: "spring", 
                             stiffness: 500, 
                             damping: 30,
