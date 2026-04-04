@@ -37,20 +37,27 @@ const SYMBOL_SIZE = 80;
 const BET_STEPS = [0.30, 0.60, 1.20, 2.40, 5.00, 10.00, 20.00, 50.00, 100.00];
 
 const INITIAL_SYMBOLS = [
-  { id: 'special_week', name: 'Special Week', image: 'https://image2url.com/r2/default/images/1775228759172-cbc495b9-66ca-4504-8bbb-516edeccf7b5.png', value: 50 },
-  { id: 'silence_suzuka', name: 'Silence Suzuka', image: 'https://image2url.com/r2/default/images/1775228812296-24a81a9e-4c95-4a69-829c-00ecb7df7894.png', value: 25 },
+  { id: 'special_week', name: 'Special Week', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744884538/files/user/character/specialweek/specialweek_list.png', value: 50 },
+  { id: 'silence_suzuka', name: 'Silence Suzuka', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744884593/files/user/character/silencesuzuka/silencesuzuka_list.png', value: 25 },
   { id: 'tokai_teio', name: 'Tokai Teio', image: 'https://image2url.com/r2/default/images/1775228840873-351ab72e-cec0-4998-83ad-15020b570cc5.png', value: 15 },
   { id: 'mejiro_mcqueen', name: 'Mejiro McQueen', image: 'https://image2url.com/r2/default/images/1775228872375-a9b85708-5621-482c-8918-527224ee27de.png', value: 10 },
   { id: 'gold_ship', name: 'Gold Ship', image: 'https://image2url.com/r2/default/images/1775228902891-7d7aa637-07ab-4d49-bed9-cde315420c19.png', value: 5 },
   { id: 'vodka', name: 'Vodka', image: 'https://image2url.com/r2/default/images/1775228927818-b97d7eea-0cca-448f-8448-e4d6c732fd95.png', value: 2 },
   { id: 'daiwa_scarlet', name: 'Daiwa Scarlet', image: 'https://image2url.com/r2/default/images/1775228945973-76cc0e65-2fe9-424b-b60c-1385c591e6c9.png', value: 1.5 },
-  { id: 'rice_shower', name: 'Rice Shower', image: 'https://picsum.photos/seed/rice_shower/200/200', value: 1 },
+  { id: 'grass_wonder', name: 'Grass Wonder', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744944665/files/user/character/grasswonder/grasswonder_list.png', value: 1.2 },
+  { id: 'hishi_amazon', name: 'Hishi Amazon', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744944689/files/user/character/hishiamazon/hishiamazon_list.png', value: 1.1 },
+  { id: 'symboli_rudolf', name: 'Symboli Rudolf', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1083_108302.png', value: 1.0 },
+  { id: 'mejiro_ardan', name: 'Mejiro Ardan', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1753843425/files/user/character/mejiroardan/mejiroardan_list.png', value: 0.9 },
+  { id: 'curren_chan', name: 'Curren Chan', image: 'https://images.weserv.nl/?url=https://images.microcms-assets.io/assets/973fc097984b400db8729642ddff5938/ad99e436c417449aa9aba8f99aa22835/currenchan_icon.png', value: 0.8 },
+  { id: 'gran_alegria', name: 'Gran Alegria', image: 'https://images.weserv.nl/?url=https://images.microcms-assets.io/assets/973fc097984b400db8729642ddff5938/575611d9711d4da3840f13618d1c8c21/granalegria_icon.png', value: 0.7 },
+  { id: 'sirius_symboli', name: 'Sirius Symboli', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1753843697/files/user/character/siriussymboli/siriussymboli_list.png', value: 0.6 },
 ];
 
-const SCATTER_IMAGE = 'https://image2url.com/r2/default/images/1775228759172-cbc495b9-66ca-4504-8bbb-516edeccf7b5.png';
+const SCATTER_IMAGE = 'https://images.weserv.nl/?url=https://images.microcms-assets.io/assets/973fc097984b400db8729642ddff5938/75073e52e88c432f80a4e60333884f77/satonodiamond_list.png';
+const SUPER_SCATTER_IMAGE = 'https://images.weserv.nl/?url=https://images.microcms-assets.io/assets/973fc097984b400db8729642ddff5938/fc93e52618534b6c88eddf78570851aa/ikunodictus_list.png';
 const INITIAL_SCATTER_SYMBOL = { id: 'scatter', name: 'Derby Logo', image: SCATTER_IMAGE, value: 0 };
-const INITIAL_SUPER_SCATTER_SYMBOL = { id: 'super_scatter', name: 'Super Derby Logo', image: SCATTER_IMAGE, value: 0 };
-const INITIAL_MULTIPLIER_SYMBOL = { id: 'multiplier', name: 'Multiplier', image: 'https://picsum.photos/seed/multiplier/200/200', value: 0 };
+const INITIAL_SUPER_SCATTER_SYMBOL = { id: 'super_scatter', name: 'Super Derby Logo', image: SUPER_SCATTER_IMAGE, value: 0 };
+const INITIAL_MULTIPLIER_SYMBOL = { id: 'multiplier', name: 'Multiplier', image: 'https://images.weserv.nl/?url=https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTZl4LIpnKlMSJEBTRYzC2mdN_bqD1uAf8H5Q&s', value: 0 };
 
 const MULTIPLIERS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 15, 20, 50, 100, 500, 1000];
 
@@ -109,44 +116,6 @@ export default function App() {
   const [superScatterSymbol, setSuperScatterSymbol] = useState(INITIAL_SUPER_SCATTER_SYMBOL);
   const [multiplierSymbol, setMultiplierSymbol] = useState(INITIAL_MULTIPLIER_SYMBOL);
   const gridRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const fetchAnimeImages = async () => {
-      const apis = [
-        'https://api.waifu.pics/sfw/waifu',
-        'https://api.waifu.pics/sfw/neko',
-        'https://api.waifu.pics/sfw/shinobu',
-        'https://nekos.best/api/v2/neko',
-        'https://nekos.best/api/v2/waifu',
-        'https://api.waifu.im/search'
-      ];
-
-      const fetchRandomImage = async () => {
-        const api = apis[Math.floor(Math.random() * apis.length)];
-        try {
-          const res = await fetch(api);
-          const data = await res.json();
-          return data.url || (data.results && data.results[0].url) || (data.images && data.images[0].url) || 'https://picsum.photos/seed/anime/200/200';
-        } catch (e) {
-          console.error("Failed to fetch anime image from", api, e);
-          return 'https://picsum.photos/seed/anime/200/200';
-        }
-      };
-
-      const [riceShower, scatter, superScatter, multiplier] = await Promise.all([
-        fetchRandomImage(),
-        fetchRandomImage(),
-        fetchRandomImage(),
-        fetchRandomImage()
-      ]);
-
-      setSymbols(prev => prev.map(s => s.id === 'rice_shower' ? { ...s, image: riceShower } : s));
-      setScatterSymbol(prev => ({ ...prev, image: scatter }));
-      setSuperScatterSymbol(prev => ({ ...prev, image: superScatter }));
-      setMultiplierSymbol(prev => ({ ...prev, image: multiplier }));
-    };
-    fetchAnimeImages();
-  }, []);
 
   // --- Logic ---
 
@@ -540,26 +509,33 @@ export default function App() {
               )}
 
               {state.grid.map((col, x) => (
-                <div key={x} className="flex flex-col gap-1 sm:gap-2 [transform-style:preserve-3d]">
-                  <AnimatePresence mode="popLayout">
+                <div key={x} className="flex flex-col gap-1 sm:gap-2 [transform-style:preserve-3d] h-full">
+                  <AnimatePresence>
                     {col.map((sym, y) => {
                       if (!sym) return null;
-                      const symbolData = sym.type === 'normal' 
+                      const symbolData = (sym.type === 'normal' 
                         ? symbols.find(s => s.id === sym.id) 
-                        : sym.type === 'scatter' ? scatterSymbol : multiplierSymbol;
+                        : sym.type === 'scatter' 
+                          ? scatterSymbol 
+                          : sym.type === 'super_scatter'
+                            ? superScatterSymbol
+                            : multiplierSymbol) || symbols[0];
                       
                       return (
                         <motion.div
                           key={sym.instanceId}
-                          initial={{ opacity: 0, scale: 0.5 }}
+                          layout
+                          initial={{ opacity: 0, scale: 0.5, y: -20 }}
                           animate={sym.isWinning ? {
                             opacity: 1,
                             scale: [1, 1.1, 1],
+                            y: 0
                           } : { 
                             opacity: 1, 
                             scale: 1,
+                            y: 0
                           }}
-                          exit={{ opacity: 0, scale: 0 }}
+                          exit={{ opacity: 0, scale: 0, transition: { duration: 0.2 } }}
                           transition={sym.isWinning ? {
                             duration: 0.6,
                             repeat: Infinity,
@@ -571,7 +547,7 @@ export default function App() {
                             mass: 1
                           }}
                           className={cn(
-                            "aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-3xl relative group cursor-default",
+                            "w-full aspect-square rounded-lg sm:rounded-xl flex items-center justify-center text-xl sm:text-3xl relative group cursor-default",
                             sym.isWinning && "ring-2 sm:ring-4 ring-white ring-offset-1 sm:ring-offset-2 ring-offset-black z-10",
                             sym.type === 'multiplier' && "animate-bounce shadow-[0_0_10px_rgba(34,197,94,0.5)]"
                           )}
@@ -580,9 +556,10 @@ export default function App() {
                             <img 
                               src={symbolData?.image} 
                               alt={symbolData?.name} 
+                              referrerPolicy="no-referrer"
                               className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg" 
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://picsum.photos/seed/anime/200/200';
+                                (e.target as HTMLImageElement).src = 'https://images.weserv.nl/?url=https://cdn.waifu.im/7533.jpg';
                               }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent pointer-events-none" />
