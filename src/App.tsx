@@ -83,7 +83,6 @@ interface GameState {
   isSuperFreeSpins: boolean;
   history: number[];
   aiMessage: string;
-  spinsSinceLastScatter: number;
 }
 
 // --- AI Service ---
@@ -102,7 +101,6 @@ export default function App() {
     isSuperFreeSpins: false,
     history: [],
     aiMessage: "Welcome, Trainer! Ready for the big race?",
-    spinsSinceLastScatter: 0,
   });
 
   const spinSound = useSound('https://actions.google.com/sounds/v1/foley/whoosh_swish_1.ogg');
@@ -119,23 +117,23 @@ export default function App() {
 
   // --- Logic ---
 
-  const generateRandomSymbol = useCallback((isSuper = false, spinsSinceLastScatter = 0): SymbolInstance => {
+  const generateRandomSymbol = useCallback((isSuper = false): SymbolInstance => {
     const rand = Math.random();
     const instanceId = Math.random().toString(36).substring(7);
 
     // Multiplier chance
-    const multiplierChance = isSuper ? 0.15 : 0.03;
+    const multiplierChance = isSuper ? 0.20 : 0.05;
     if (rand < multiplierChance) {
       const multRand = Math.random();
       let val = 2;
 
-      if (multRand < 0.00001) val = 1000;      // 0.001% chance
-      else if (multRand < 0.00005) val = 500;  // 0.004% chance
-      else if (multRand < 0.0002) val = 100;   // 0.015% chance
-      else if (multRand < 0.01) val = 50;     // 0.8% chance
-      else if (multRand < 0.05) val = 20;     // 4% chance
-      else if (multRand < 0.15) val = 15;     // 10% chance
-      else if (multRand < 0.3) val = 10;      // 15% chance
+      if (multRand < 0.0001) val = 1000;      // 0.01% chance
+      else if (multRand < 0.0005) val = 500;  // 0.05% chance
+      else if (multRand < 0.002) val = 100;   // 0.2% chance
+      else if (multRand < 0.02) val = 50;     // 2% chance
+      else if (multRand < 0.1) val = 20;      // 10% chance
+      else if (multRand < 0.25) val = 15;     // 25% chance
+      else if (multRand < 0.4) val = 10;      // 40% chance
       else {
         // Common multipliers (2x to 9x)
         const commonMults = [2, 3, 4, 5, 6, 7, 8, 9];
@@ -145,12 +143,12 @@ export default function App() {
       return { id: 'multiplier', instanceId, type: 'multiplier', multiplierValue: val };
     }
 
-    // Scatter chance (base 0.005, increases with spins)
-    const scatterChance = 0.005 + (spinsSinceLastScatter * 0.001);
+    // Fixed Scatter chance (2.5% per symbol)
+    const scatterChance = 0.025;
     if (rand < multiplierChance + scatterChance) {
-      // Determine if it's a super scatter (10% chance)
-      const isSuper = Math.random() < 0.1;
-      return { id: isSuper ? 'super_scatter' : 'scatter', instanceId, type: isSuper ? 'super_scatter' : 'scatter' };
+      // Determine if it's a super scatter (15% chance)
+      const isSuperScatter = Math.random() < 0.15;
+      return { id: isSuperScatter ? 'super_scatter' : 'scatter', instanceId, type: isSuperScatter ? 'super_scatter' : 'scatter' };
     }
 
     // Normal symbols
@@ -161,7 +159,7 @@ export default function App() {
   const initializeGrid = useCallback(() => {
     setState(prev => {
       const newGrid = Array(COLS).fill(0).map(() => 
-        Array(ROWS).fill(0).map(() => generateRandomSymbol(prev.isSuperFreeSpins, prev.spinsSinceLastScatter))
+        Array(ROWS).fill(0).map(() => generateRandomSymbol(prev.isSuperFreeSpins))
       );
       return { ...prev, grid: newGrid };
     });
@@ -221,12 +219,11 @@ export default function App() {
 
     let win = 0;
     Object.entries(counts).forEach(([id, count]) => {
-      if (count >= 8) {
+      if (count >= 6) { // Lowered from 8 to 6 for more generous tumbles
         const symbol = symbols.find(s => s.id === id);
         if (symbol) {
-          // Payout formula: base value * (count - 7) * bet
-          // This is a simplified version of scatter pays
-          const multiplier = count >= 12 ? 10 : count >= 10 ? 4 : 1;
+          // Payout formula: base value * multiplier * bet
+          const multiplier = count >= 12 ? 10 : count >= 10 ? 5 : count >= 8 ? 2 : 1;
           win += symbol.value * multiplier * (state.bet / 1.20);
           
           // Mark winning instances
@@ -263,10 +260,21 @@ export default function App() {
       if (win > 0) {
         winSound();
         confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
+          particleCount: 150,
+          spread: 100,
+          origin: { y: 0.6 },
+          colors: ['#FFD700', '#FFA500', '#FF6347', '#00FF00', '#00BFFF']
         });
+        if (win > state.bet * 10) {
+          setTimeout(() => {
+            confetti({
+              particleCount: 200,
+              spread: 160,
+              origin: { y: 0.5 },
+              colors: ['#FFD700', '#FFFFFF']
+            });
+          }, 250);
+        }
       }
       accumulatedMultipliers = [...accumulatedMultipliers, ...currentMultipliers];
 
@@ -287,7 +295,7 @@ export default function App() {
       // Fill gaps
       currentGrid = currentGrid.map(col => {
         const missing = ROWS - col.length;
-        const newSyms = Array(missing).fill(0).map(() => generateRandomSymbol(state.isSuperFreeSpins, state.spinsSinceLastScatter));
+        const newSyms = Array(missing).fill(0).map(() => generateRandomSymbol(state.isSuperFreeSpins));
         return [...newSyms, ...col];
       });
 
@@ -327,7 +335,6 @@ export default function App() {
     }
 
     setState(prev => {
-      const newSpinsSinceLastScatter = (freeSpinsTriggered || superFreeSpinsTriggered) ? 0 : prev.spinsSinceLastScatter + 1;
       let newFreeSpinsRemaining = prev.freeSpinsRemaining;
       let newIsFreeSpins = prev.isFreeSpins;
       let newIsSuperFreeSpins = prev.isSuperFreeSpins;
@@ -356,7 +363,6 @@ export default function App() {
         isFreeSpins: newIsFreeSpins,
         isSuperFreeSpins: newIsSuperFreeSpins,
         freeSpinsRemaining: newFreeSpinsRemaining,
-        spinsSinceLastScatter: newSpinsSinceLastScatter,
         aiMessage: superFreeSpinsTriggered ? "SUPER CLIMAX MODE ACTIVATED! Ultimate win potential!" 
                  : freeSpinsTriggered ? "CLIMAX MODE ACTIVATED! Let's go for the win!" 
                  : prev.aiMessage
@@ -364,11 +370,12 @@ export default function App() {
     });
 
     if (finalWin > 0 || freeSpinsTriggered || superFreeSpinsTriggered) {
-      if (finalMultiplier > 1) {
+      if (finalMultiplier > 1 || freeSpinsTriggered || superFreeSpinsTriggered) {
         confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
+          particleCount: 250,
+          spread: 120,
+          origin: { y: 0.7 },
+          colors: ['#FFD700', '#FFA500', '#FF6347', '#00FF00', '#00BFFF', '#FF1493']
         });
       }
       updateAIMessage(finalWin, state.isFreeSpins || freeSpinsTriggered || superFreeSpinsTriggered);
@@ -393,14 +400,14 @@ export default function App() {
 
     // Initial spin animation
     const newGrid = Array(COLS).fill(0).map(() => 
-      Array(ROWS).fill(0).map(() => generateRandomSymbol(state.isSuperFreeSpins, state.spinsSinceLastScatter))
+      Array(ROWS).fill(0).map(() => generateRandomSymbol(state.isSuperFreeSpins))
     );
     
     setState(prev => ({ ...prev, grid: newGrid }));
     await new Promise(r => setTimeout(r, 400));
     
     await tumble(newGrid);
-  }, [state.isSpinning, state.balance, state.bet, state.isFreeSpins, state.isSuperFreeSpins, state.spinsSinceLastScatter, generateRandomSymbol, tumble]);
+  }, [state.isSpinning, state.balance, state.bet, state.isFreeSpins, state.isSuperFreeSpins, generateRandomSymbol, tumble]);
 
   // Auto Spin Effect
   useEffect(() => {
