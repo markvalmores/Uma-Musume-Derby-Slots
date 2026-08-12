@@ -39,11 +39,11 @@ const BET_STEPS = [0.30, 0.60, 1.20, 2.40, 5.00, 10.00, 20.00, 50.00, 100.00];
 const INITIAL_SYMBOLS = [
   { id: 'special_week', name: 'Special Week', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744884538/files/user/character/specialweek/specialweek_list.png', value: 50 },
   { id: 'silence_suzuka', name: 'Silence Suzuka', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744884593/files/user/character/silencesuzuka/silencesuzuka_list.png', value: 25 },
-  { id: 'tokai_teio', name: 'Tokai Teio', image: 'https://image2url.com/r2/default/images/1775228840873-351ab72e-cec0-4998-83ad-15020b570cc5.png', value: 15 },
-  { id: 'mejiro_mcqueen', name: 'Mejiro McQueen', image: 'https://image2url.com/r2/default/images/1775228872375-a9b85708-5621-482c-8918-527224ee27de.png', value: 10 },
-  { id: 'gold_ship', name: 'Gold Ship', image: 'https://image2url.com/r2/default/images/1775228902891-7d7aa637-07ab-4d49-bed9-cde315420c19.png', value: 5 },
-  { id: 'vodka', name: 'Vodka', image: 'https://image2url.com/r2/default/images/1775228927818-b97d7eea-0cca-448f-8448-e4d6c732fd95.png', value: 2 },
-  { id: 'daiwa_scarlet', name: 'Daiwa Scarlet', image: 'https://image2url.com/r2/default/images/1775228945973-76cc0e65-2fe9-424b-b60c-1385c591e6c9.png', value: 1.5 },
+  { id: 'tokai_teio', name: 'Tokai Teio', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1003_100301.png', value: 15 },
+  { id: 'mejiro_mcqueen', name: 'Mejiro McQueen', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1013_101301.png', value: 10 },
+  { id: 'gold_ship', name: 'Gold Ship', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1007_100701.png', value: 5 },
+  { id: 'vodka', name: 'Vodka', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1008_100801.png', value: 2 },
+  { id: 'daiwa_scarlet', name: 'Daiwa Scarlet', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1009_100901.png', value: 1.5 },
   { id: 'grass_wonder', name: 'Grass Wonder', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744944665/files/user/character/grasswonder/grasswonder_list.png', value: 1.2 },
   { id: 'hishi_amazon', name: 'Hishi Amazon', image: 'https://images.weserv.nl/?url=https://en-portal.g.kuroco-img.app/v=1744944689/files/user/character/hishiamazon/hishiamazon_list.png', value: 1.1 },
   { id: 'symboli_rudolf', name: 'Symboli Rudolf', image: 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1083_108302.png', value: 1.0 },
@@ -566,7 +566,7 @@ export default function App() {
                               referrerPolicy="no-referrer"
                               className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded-lg" 
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src = 'https://images.weserv.nl/?url=https://cdn.waifu.im/7533.jpg';
+                                (e.target as HTMLImageElement).src = 'https://images.weserv.nl/?url=https://gametora.com/images/umamusume/characters/chara_stand_1001_100101.png';
                               }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-tr from-white/40 to-transparent pointer-events-none" />
